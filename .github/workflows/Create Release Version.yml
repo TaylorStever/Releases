@@ -6,17 +6,26 @@ name: Release
 # Run on every commit tag which begins with “v” (e.g., “v0.1.4”)
 
 on:
-    push: 
-       tags:
--	“v*”
-
-#Automatically create a GitHub Release, with release details specified (the relevant commits)
+  push: 
+    tags:
+      - “v*”
+    workflow_dispatch:
+    inputs:
+      environment:
+      description: 'Re-run Action'
+      required: true
+      default: 'Re-run Action'
+      type: choice
+      options:
+        - Re-run Action
+        
+# Automatically create a GitHub Release, with release details specified (the relevant commits)
 jobs:
-   release:
-      name: “Release”
-      runs-on: “ubuntu-latest”
-      steps:
--	uses: “marvinpinto/action-automatic-release@latest”
--	with:
-   repo_token:${{ secrets.GITHUB_TOKEN }}”
-    prerelease: false
+  release:
+    name: “Release”
+    runs-on: “ubuntu-latest”
+    steps:
+      - uses: “marvinpinto/action-automatic-release@latest”
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}”
+          prerelease: false
