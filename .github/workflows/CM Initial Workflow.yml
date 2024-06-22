@@ -26,4 +26,8 @@ jobs:
 
 # Steps represent a sequence of tasks that will be executed as part of the job
   steps:
+    -uses: “marvinpinto/action-automatic-release@latest”
+    -with: repo_token:${{ secrets.GITHUB_TOKEN }}”
+    prerelease: false
+ 
 # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
