@@ -1,10 +1,9 @@
-Filename: Create Release Version.yml
+Filename: Create Release Versions.yml
 
 # Name of the Workflow
-name: Release
+name: Create Release Versions
 
 # Run on every commit tag which begins with “v” (e.g., “v0.1.4”)
-
 on:
   push: 
     tags:
@@ -12,7 +11,7 @@ on:
     workflow_dispatch:
     inputs:
       environment:
-      description: 'Re-run Action'
+      description: 'Re-run failed job'
       required: true
       default: 'Re-run Action'
       type: choice
@@ -22,7 +21,7 @@ on:
 # Automatically create a GitHub Release, with release details specified (the relevant commits)
 jobs:
   release:
-    name: “Release”
+    name: “Create Release Versions”
     runs-on: “ubuntu-latest”
     steps:
       - uses: “marvinpinto/action-automatic-release@latest”
