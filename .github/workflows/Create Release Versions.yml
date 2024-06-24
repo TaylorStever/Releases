@@ -10,7 +10,7 @@ on:
       - “v*”
     workflow_dispatch:
     inputs:
-      environment:
+      reason:
       description: 'Re-run Action'
       required: true
       default: 'Re-run Action'
