@@ -1,0 +1,104 @@
+name: Label, Notify, Create Release, and Deploy
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+  workflow_dispatch:
+      inputs:
+        environment:
+        description: 'Re-run Action'
+        required: true
+        default: 'Re-run Action'
+        type: choice
+        options:
+          - Re-run Action
+        
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js 22.x
+      uses: actions/setup-node@v3
+      with:
+        node-version: '22.x'
+
+    #- name: Install dependencies
+      #run: npm install
+
+    - name: Run tests
+      run: npm test
+
+    - name: Get current version
+      id: get_version
+      run: echo "::set-output name=version::$(cat VERSION)"
+
+    - name: Increment version
+      id: increment_version
+      run: |
+        current_version=$(cat VERSION)
+        echo "Current version: $current_version"
+        IFS='.' read -r -a version_parts <<< "$current_version"
+        version_parts[3]=$((version_parts[3] + 1))
+        new_version="${version_parts[0]}.${version_parts[1]}.${version_parts[2]}.${version_parts[3]}"
+        echo "New version: $new_version"
+        echo "$new_version" > VERSION
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+        git add VERSION
+        git commit -m "Increment version to $new_version"
+        git push origin main
+        echo "::set-output name=new_version::$new_version"
+
+    - name: Label Pull Request
+      if: github.event_name == 'pull_request'
+      uses: actions-ecosystem/action-add-labels@v1
+      #with:
+        #github_token: ${{ secrets.GITHUB_TOKEN }}
+        #labels: 'CM Production Release v24.7.0.0'
+
+    - name: Create Release
+      if: github.ref == 'refs/heads/main'
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ steps.increment_version.outputs.new_version }}
+        release_name: "Release v${{ steps.increment_version.outputs.new_version }}"
+        draft: false
+        prerelease: false
+
+    - name: Notify via Email
+      uses: dawidd6/action-send-mail@v3
+      with:
+        server_address: smtp.gmail.com
+        server_port: 465
+        username: ${{ secrets.EMAIL_USERNAME }}
+        password: ${{ secrets.EMAIL_PASSWORD }}
+        subject: GitHub Actions Notification
+        body: 'A new release has been created: v${{ steps.increment_version.outputs.new_version }}'
+        to: taylorsteve1738@gmail.com
+        from: ${{ secrets.EMAIL_USERNAME }}
+
+    - name: Deploy to Server
+      uses: easingthemes/ssh-deploy@v2.1.5
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        ARGS: "-rltgoDzvO"
+      with:
+        remote_host: ${{ secrets.REMOTE_HOST }}
+        remote_user: ${{ secrets.REMOTE_USER }}
+        source: "dist/"
+        target: "/var/www/html/"
+
+    - name: Clean up
+      run: echo "Deployment process completed."
