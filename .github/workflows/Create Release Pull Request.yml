@@ -1,12 +1,12 @@
 name: 'Create Release Pull Request'
 
-#on: 
-  #create:
+on: 
+  create:
   
-on:
-  push:
-    tags:
-      - "v*"  
+#on:
+  #push:
+    #tags:
+      #- "v*"  
 
   workflow_dispatch:
        inputs:
