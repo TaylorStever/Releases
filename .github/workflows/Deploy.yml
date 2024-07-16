@@ -8,7 +8,7 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
   tags:
-      - "v*"
+      - "v**.*.*.*"
       
   workflow_dispatch:
       inputs:
