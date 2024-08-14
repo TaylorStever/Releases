@@ -5,7 +5,7 @@ name: Release
 on:
   push:
     tags:
-      - "v**.*.*.*"
+      - "v*"
 
   workflow_dispatch:
        inputs:
@@ -17,13 +17,31 @@ on:
            options:
             - Re-Run Action
 
-# Automatically create a GitHub Release, with release details specified (the relevant commits)
+# Automatically create a GitHub Release, with release details specified (the relevant commits) 
 jobs:
-  release:
-    name: "Release"
+  tagged-release:
+    name: "Tagged Release"
     runs-on: "ubuntu-latest"
+
     steps:
+      # ...
+      - name: "Build & test"
+        run: |
+          echo "done!"
+
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
+          files: |
+            LICENSE.txt
+            *.jar
+#jobs:
+  #release:
+    #name: "Release"
+    #runs-on: "ubuntu-latest"
+    #steps:
+      #- uses: "marvinpinto/action-automatic-releases@latest"
+        #with:
+          #repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          #prerelease: false
