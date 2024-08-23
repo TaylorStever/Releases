@@ -4,8 +4,10 @@ name: Release
 # Run on every commit tag which begins with "v" (e.g., "v0.1.4")
 on:
   pull_request:
+    types: [opened, synchronize, reopened]
     branches:
       - main
+      - Release "v*"
   push:
     tags:
       - "v*"
