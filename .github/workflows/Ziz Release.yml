@@ -5,17 +5,7 @@ name: Ziz Release
 on:
   push:
     tags:
-      - "v*"
-
-  workflow_dispatch:
-       inputs:
-           environment:
-           description: "Re-run Action"
-           required: true
-           default: "Re-run Action"
-           type: choice
-           options:
-            - Re-Run Action    
+      - "v*"  
 
 # Automatically create a GitHub Release, with release details specified (the relevant commits)
 jobs:
